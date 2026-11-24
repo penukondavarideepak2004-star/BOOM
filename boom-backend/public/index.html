@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BOOM — Interactive Product Experience</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    :root {
+      --electric-indigo: #6C5CE7;
+      --neon-cyan: #00F2FE;
+      --neon-coral: #FF6584;
+      --bg-dark: #0B0E17;
+      --surface-dark: #141927;
+      --surface-elevated: #1E2538;
+      --surface-border: #2A334E;
+    }
+    @keyframes pulseWave {
+      0%, 100% { height: 18px; }
+      50% { height: 64px; }
+    }
+    .wave-bar {
+      animation: pulseWave 1.2s ease-in-out infinite;
+    }
+    .wave-bar:nth-child(1) { animation-delay: 0.1s; }
+    .wave-bar:nth-child(2) { animation-delay: 0.3s; }
+    .wave-bar:nth-child(3) { animation-delay: 0.5s; }
+    .wave-bar:nth-child(4) { animation-delay: 0.2s; }
+    .wave-bar:nth-child(5) { animation-delay: 0.4s; }
+    .wave-bar:nth-child(6) { animation-delay: 0.15s; }
+    .wave-bar:nth-child(7) { animation-delay: 0.35s; }
+    .wave-bar:nth-child(8) { animation-delay: 0.25s; }
+    .wave-bar:nth-child(9) { animation-delay: 0.45s; }
+
+    .reduced-motion .wave-bar {
+      animation: none !important;
+      height: 24px !important;
+    }
+  </style>
+</head>
+<body class="bg-[#0B0E17] text-white font-sans antialiased min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+  <!-- Header Banner -->
+  <header class="max-w-4xl w-full text-center mb-6">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1E2538] border border-[#2A334E] text-xs font-semibold text-[#00F2FE] mb-2">
+      <span class="w-2 h-2 rounded-full bg-[#00F2FE] animate-ping"></span>
+      PRODUCT VERIFICATION & INTERACTIVE DEMO
+    </div>
+    <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-[#6C5CE7] via-[#FF6584] to-[#00F2FE] bg-clip-text text-transparent">
+      BOOM Interactive Experience
+    </h1>
+    <p class="text-gray-400 text-sm mt-1">
+      Explore every screen and interaction built for the BOOM native Android social listening platform.
+    </p>
+  </header>
+
+  <!-- Interactive Controls Bar -->
+  <div class="max-w-4xl w-full bg-[#141927] border border-[#2A334E] rounded-2xl p-3 mb-6 shadow-xl flex flex-wrap items-center justify-between gap-3">
+    <!-- Screen Switcher Pills -->
+    <div class="flex flex-wrap gap-1.5" id="navPills">
+      <button onclick="setScreen('welcome')" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-[#6C5CE7] text-white transition-all shadow" data-screen="welcome">
+        ⚡ Welcome
+      </button>
+      <button onclick="setScreen('dashboard')" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-[#1E2538] text-gray-300 hover:text-white transition-all" data-screen="dashboard">
+        🏠 Dashboard
+      </button>
+      <button onclick="setScreen('host_control')" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-[#1E2538] text-gray-300 hover:text-white transition-all" data-screen="host_control">
+        👑 Host Control
+      </button>
+      <button onclick="setScreen('participant')" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-[#1E2538] text-gray-300 hover:text-white transition-all" data-screen="participant">
+        🎧 Guest Dashboard
+      </button>
+      <button onclick="setScreen('chat')" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-[#1E2538] text-gray-300 hover:text-white transition-all" data-screen="chat">
+        💬 Unified Chat
+      </button>
+      <button onclick="setScreen('activities')" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-[#1E2538] text-gray-300 hover:text-white transition-all" data-screen="activities">
+        🎵 Activities & Music
+      </button>
+      <button onclick="setScreen('guardian')" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-[#1E2538] text-gray-300 hover:text-white transition-all" data-screen="guardian">
+        🛡️ Security Centre
+      </button>
+    </div>
+
+    <!-- Accessibility / View Controls -->
+    <div class="flex items-center gap-3 text-xs text-gray-400">
+      <label class="flex items-center gap-1.5 cursor-pointer select-none">
+        <input type="checkbox" id="motionToggle" onchange="toggleMotion()" class="rounded bg-[#1E2538] border-[#2A334E] text-[#6C5CE7] focus:ring-0">
+        <span>Reduced Motion (UI-02)</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Device Frame Mockup -->
+  <div class="relative w-full max-w-[390px] h-[780px] bg-[#141927] border-[6px] border-[#2A334E] rounded-[44px] shadow-2xl overflow-hidden flex flex-col transition-all" id="deviceContainer">
+    
+    <!-- Phone Top Status Bar -->
+    <div class="h-8 bg-[#0B0E17]/80 backdrop-blur-md px-6 flex items-center justify-between text-[11px] text-gray-400 select-none z-20">
+      <span>11:42</span>
+      <div class="w-20 h-4 bg-black rounded-full mx-auto"></div>
+      <div class="flex items-center gap-1.5">
+        <span>5G</span>
+        <span class="text-[#00F2FE]">100%</span>
+      </div>
+    </div>
+
+    <!-- SCREEN 1: WELCOME SCREEN (UI-01, UI-02) -->
+    <div id="screen_welcome" class="screen flex-1 p-6 flex flex-col items-center justify-between text-center">
+      <div class="mt-8">
+        <span class="text-xs font-semibold tracking-widest text-[#00F2FE] uppercase">Nearby Social Sound</span>
+        <h2 class="text-4xl font-extrabold tracking-tight mt-2 bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">BOOM</h2>
+        <p class="text-xs text-gray-400 mt-2 max-w-xs">Synchronized listening sessions across phones with local privacy & security.</p>
+      </div>
+
+      <!-- Pulsing Audio Wave (UI-02) -->
+      <div class="my-auto flex items-center justify-center gap-1.5 h-28 w-64 bg-[#1E2538]/60 rounded-2xl border border-[#2A334E] p-4 shadow-inner" id="welcomeWaveBox">
+        <div class="wave-bar w-2 bg-gradient-to-t from-[#6C5CE7] to-[#00F2FE] rounded-full"></div>
+        <div class="wave-bar w-2 bg-gradient-to-t from-[#6C5CE7] to-[#00F2FE] rounded-full"></div>
+        <div class="wave-bar w-2 bg-gradient-to-t from-[#6C5CE7] to-[#00F2FE] rounded-full"></div>
+        <div class="wave-bar w-2 bg-gradient-to-t from-[#FF6584] to-[#6C5CE7] rounded-full"></div>
+        <div class="wave-bar w-2 bg-gradient-to-t from-[#FF6584] to-[#00F2FE] rounded-full"></div>
+        <div class="wave-bar w-2 bg-gradient-to-t from-[#FF6584] to-[#6C5CE7] rounded-full"></div>
+        <div class="wave-bar w-2 bg-gradient-to-t from-[#6C5CE7] to-[#00F2FE] rounded-full"></div>
+        <div class="wave-bar w-2 bg-gradient-to-t from-[#6C5CE7] to-[#00F2FE] rounded-full"></div>
+        <div class="wave-bar w-2 bg-gradient-to-t from-[#6C5CE7] to-[#00F2FE] rounded-full"></div>
+      </div>
+
+      <div class="w-full mb-4 space-y-3">
+        <button onclick="setScreen('dashboard')" class="w-full py-3.5 px-4 bg-gradient-to-r from-[#6C5CE7] to-[#00F2FE] text-white font-bold text-sm rounded-xl shadow-lg hover:opacity-95 active:scale-[0.98] transition">
+          Enter Main Dashboard →
+        </button>
+        <p class="text-[10px] text-gray-500">Sub-millisecond NTP RTT/2 sync • Hardware Keystore</p>
+      </div>
+    </div>
+
+    <!-- SCREEN 2: MAIN DASHBOARD (DASH-01) -->
+    <div id="screen_dashboard" class="screen hidden flex-1 p-5 overflow-y-auto space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-[#2A334E]">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-[#6C5CE7] to-[#FF6584] flex items-center justify-center font-bold text-sm">
+            AS
+          </div>
+          <div>
+            <div class="text-xs text-gray-400">Welcome Back</div>
+            <div class="text-sm font-bold">Alex Smith</div>
+          </div>
+        </div>
+        <button onclick="setScreen('guardian')" class="px-2.5 py-1 bg-[#1E2538] hover:bg-[#2A334E] border border-[#00F2FE]/40 rounded-full text-[10px] font-semibold text-[#00F2FE] flex items-center gap-1.5 transition">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#00F2FE]"></span>
+          100% Secure
+        </button>
+      </div>
+
+      <!-- Card: Host a Party -->
+      <div class="bg-gradient-to-br from-[#6C5CE7]/30 to-[#1E2538] border border-[#6C5CE7]/50 rounded-2xl p-4 shadow-lg hover:border-[#6C5CE7] transition">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[10px] font-bold tracking-widest text-[#00F2FE] uppercase">Host Authority</span>
+          <span class="text-lg">📢</span>
+        </div>
+        <h3 class="text-base font-bold text-white">Host a Party</h3>
+        <p class="text-xs text-gray-300 mt-1">Broadcast high-precision audio to nearby phones and control room vibe.</p>
+        <button onclick="setScreen('host_control')" class="mt-4 w-full py-2.5 bg-[#6C5CE7] hover:bg-[#5b4bc4] text-white text-xs font-bold rounded-xl transition">
+          Start Party as Host
+        </button>
+      </div>
+
+      <!-- Card: Join a Party -->
+      <div class="bg-gradient-to-br from-[#FF6584]/20 to-[#1E2538] border border-[#FF6584]/40 rounded-2xl p-4 shadow-lg hover:border-[#FF6584] transition">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[10px] font-bold tracking-widest text-[#FF6584] uppercase">Guest Mode</span>
+          <span class="text-lg">📱</span>
+        </div>
+        <h3 class="text-base font-bold text-white">Join Nearby Party</h3>
+        <p class="text-xs text-gray-300 mt-1">Pair with Host via 6-digit short code or QR scan. Independent local volume.</p>
+        <button onclick="setScreen('participant')" class="mt-4 w-full py-2.5 bg-[#FF6584] hover:bg-[#e05370] text-white text-xs font-bold rounded-xl transition">
+          Scan QR / Enter Code
+        </button>
+      </div>
+
+      <!-- Guardian Security Status Card -->
+      <div onclick="setScreen('guardian')" class="bg-[#1E2538] border border-[#2A334E] hover:border-[#00F2FE]/50 rounded-2xl p-3.5 flex items-center justify-between cursor-pointer transition">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-full bg-[#00F2FE]/10 border border-[#00F2FE]/40 flex items-center justify-center text-[#00F2FE] text-sm">
+            🛡️
+          </div>
+          <div>
+            <div class="text-xs font-bold text-white">BOOM Guardian</div>
+            <div class="text-[10px] text-gray-400">All 4 defense layers active & verified</div>
+          </div>
+        </div>
+        <span class="text-xs text-[#00F2FE] font-semibold">View →</span>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: HOST CONTROL PANEL (HOST-03 to HOST-06) -->
+    <div id="screen_host_control" class="screen hidden flex-1 p-5 overflow-y-auto space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-bold text-[#6C5CE7] uppercase">Party Host Mode</span>
+          <h3 class="text-base font-extrabold text-white">Friday Mega Boom</h3>
+        </div>
+        <div class="px-2.5 py-1 bg-[#6C5CE7]/20 border border-[#6C5CE7] rounded-lg text-xs font-mono font-bold text-white">
+          CODE: BOOM77
+        </div>
+      </div>
+
+      <!-- Pending Approval Banner (HOST-03) -->
+      <div id="pendingBox" class="bg-[#FF6584]/15 border border-[#FF6584] rounded-2xl p-3.5 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-[#FF6584] flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-[#FF6584] animate-ping"></span>
+            1 Pending Join Request
+          </span>
+          <span class="text-[10px] text-gray-400">Nearby BLE</span>
+        </div>
+        <div class="flex items-center justify-between bg-[#141927] p-2.5 rounded-xl">
+          <div class="text-xs">
+            <div class="font-bold text-white">Charlie Davis</div>
+            <div class="text-[10px] text-gray-400">Built-in Speaker • SAS: 789</div>
+          </div>
+          <div class="flex gap-1.5">
+            <button onclick="approveGuest()" class="px-2.5 py-1 bg-[#00F2FE] text-black text-[11px] font-bold rounded-lg hover:opacity-90 transition">
+              Approve
+            </button>
+            <button onclick="denyGuest()" class="px-2 py-1 bg-[#2A334E] text-gray-300 text-[11px] font-bold rounded-lg hover:text-white transition">
+              Deny
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Connected Roster (HOST-04, HOST-05) -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-xs text-gray-400">
+          <span>Connected Devices (<span id="connectedCount">2</span>/10)</span>
+          <span class="text-[#00F2FE]">±6ms Clock Drift</span>
+        </div>
+
+        <div id="rosterList" class="space-y-2">
+          <!-- Member 1 -->
+          <div class="bg-[#1E2538] border border-[#2A334E] p-3 rounded-xl flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2.5">
+              <div class="w-7 h-7 rounded-full bg-[#6C5CE7] flex items-center justify-center font-bold text-[10px]">A</div>
+              <div>
+                <div class="font-bold text-white">Alice (Host Device)</div>
+                <div class="text-[10px] text-[#00F2FE]">Clock Master (0ms ref)</div>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 bg-[#6C5CE7]/30 text-[#6C5CE7] rounded text-[10px] font-bold">HOST</span>
+          </div>
+
+          <!-- Member 2 -->
+          <div id="memberBob" class="bg-[#1E2538] border border-[#2A334E] p-3 rounded-xl flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2.5">
+              <div class="w-7 h-7 rounded-full bg-[#00F2FE]/20 text-[#00F2FE] flex items-center justify-center font-bold text-[10px]">B</div>
+              <div>
+                <div class="font-bold text-white">Bob Guest</div>
+                <div class="text-[10px] text-gray-400">Drift: -4ms • Sync: EXCELLENT</div>
+              </div>
+            </div>
+            <button onclick="kickBob()" class="px-2 py-1 bg-[#FF6584]/20 hover:bg-[#FF6584] hover:text-white text-[#FF6584] rounded text-[10px] font-semibold transition">
+              Kick
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="grid grid-cols-2 gap-2 pt-2">
+        <button onclick="setScreen('activities')" class="py-2.5 bg-[#6C5CE7] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5">
+          🎵 Activities & Music
+        </button>
+        <button onclick="setScreen('chat')" class="py-2.5 bg-[#1E2538] border border-[#2A334E] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5">
+          💬 Unified Chat
+        </button>
+      </div>
+    </div>
+
+    <!-- SCREEN 4: PARTICIPANT DASHBOARD (JOIN-03, JOIN-04, FR-06) -->
+    <div id="screen_participant" class="screen hidden flex-1 p-5 overflow-y-auto space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-bold text-[#FF6584] uppercase">Guest Listening Session</span>
+          <h3 class="text-base font-extrabold text-white">Friday Mega Boom</h3>
+        </div>
+        <div class="px-2.5 py-1 bg-[#00F2FE]/15 border border-[#00F2FE]/40 rounded-lg text-xs font-semibold text-[#00F2FE]">
+          ● SYNCED
+        </div>
+      </div>
+
+      <!-- Synchronized Playing Card -->
+      <div class="bg-gradient-to-b from-[#1E2538] to-[#141927] border border-[#2A334E] rounded-2xl p-4 text-center space-y-3">
+        <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-[#6C5CE7] to-[#00F2FE] flex items-center justify-center text-2xl shadow-lg">
+          🎧
+        </div>
+        <div>
+          <div class="text-sm font-bold text-white">Neon Resonance</div>
+          <div class="text-xs text-[#00F2FE]">HyperPulse • Master Track</div>
+        </div>
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#00F2FE]/10 rounded-full text-[10px] text-[#00F2FE] font-mono">
+          NTP RTT/2 Offset: +8ms • Speed: 1.000x
+        </div>
+      </div>
+
+      <!-- Independent Local Volume Slider (FR-06) -->
+      <div class="bg-[#1E2538] border border-[#2A334E] rounded-2xl p-4 space-y-2">
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-bold text-white">My Phone Volume (Independent)</span>
+          <span class="text-[#00F2FE] font-mono font-bold" id="volumePercent">80%</span>
+        </div>
+        <input type="range" min="0" max="100" value="80" oninput="updateVolume(this.value)" class="w-full accent-[#00F2FE] cursor-pointer">
+        <div class="flex justify-between text-[10px] text-gray-500">
+          <span>Mute</span>
+          <span>Max Output</span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="space-y-2 pt-2">
+        <button onclick="setScreen('activities')" class="w-full py-2.5 bg-[#6C5CE7] text-white text-xs font-bold rounded-xl transition">
+          Open Activities & Vibe Vote
+        </button>
+        <button onclick="setScreen('chat')" class="w-full py-2.5 bg-[#1E2538] border border-[#2A334E] text-white text-xs font-bold rounded-xl transition">
+          Open Party Chat
+        </button>
+        <button onclick="leaveParty()" class="w-full py-2.5 border border-[#FF6584]/60 text-[#FF6584] hover:bg-[#FF6584]/10 text-xs font-bold rounded-xl transition">
+          Leave Party Immediately (JOIN-04)
+        </button>
+      </div>
+    </div>
+
+    <!-- SCREEN 5: UNIFIED CHAT (CHAT-01 to CHAT-09) -->
+    <div id="screen_chat" class="screen hidden flex-1 flex flex-col justify-between overflow-hidden">
+      <!-- Chat Header -->
+      <div class="p-3 bg-[#141927] border-b border-[#2A334E] flex items-center justify-between">
+        <div>
+          <div class="text-xs font-bold text-white">Unified Party Chat</div>
+          <div class="text-[10px] text-[#00F2FE]" id="chatChannelLabel">Public Channel (Visible to Everyone)</div>
+        </div>
+        <div class="flex gap-1">
+          <button onclick="setChatFilter('all')" class="chat-tab px-2 py-0.5 rounded text-[10px] bg-[#6C5CE7] text-white">All</button>
+          <button onclick="setChatFilter('host_only')" class="chat-tab px-2 py-0.5 rounded text-[10px] bg-[#1E2538] text-gray-300">🔒 Host</button>
+          <button onclick="setChatFilter('announcements')" class="chat-tab px-2 py-0.5 rounded text-[10px] bg-[#1E2538] text-gray-300">📢 Alerts</button>
+        </div>
+      </div>
+
+      <!-- Privacy Status Banner (CHAT-04, CHAT-07) -->
+      <div id="chatPrivacyBanner" class="hidden px-3 py-1.5 bg-[#FF6584]/15 border-b border-[#FF6584]/40 text-[10px] text-[#FF6584] flex items-center gap-1.5">
+        <span>🔒</span>
+        <span>Host-Only Channel: Visible ONLY to you & the Host.</span>
+      </div>
+
+      <!-- Messages Timeline -->
+      <div class="flex-1 p-3 overflow-y-auto space-y-2.5 text-xs" id="chatTimeline">
+        <!-- Message 1: Host Announcement -->
+        <div class="p-2.5 rounded-xl bg-[#6C5CE7]/20 border border-[#00F2FE] space-y-1">
+          <div class="flex justify-between items-center text-[10px]">
+            <span class="font-bold text-[#00F2FE]">📢 ANNOUNCEMENT • Host Sam</span>
+            <span class="text-gray-400">11:38</span>
+          </div>
+          <p class="text-white">Welcome everyone! Grab drinks and cast your vote in the Vibe Poll.</p>
+        </div>
+
+        <!-- Message 2: Public message -->
+        <div class="chat-msg public flex flex-col items-start max-w-[85%]">
+          <div class="bg-[#1E2538] border border-[#2A334E] p-2.5 rounded-2xl rounded-bl-sm space-y-0.5">
+            <div class="text-[10px] font-bold text-gray-400">Alice</div>
+            <p class="text-white">Audio sync is crystal clear on my phone! 🎧</p>
+            <div class="text-[9px] text-gray-500 text-right">11:39</div>
+          </div>
+        </div>
+
+        <!-- Message 3: Host-Only Private Message -->
+        <div class="chat-msg host_only flex flex-col items-end self-end max-w-[85%] ml-auto">
+          <div class="bg-[#FF6584]/20 border border-[#FF6584]/60 p-2.5 rounded-2xl rounded-br-sm space-y-0.5">
+            <div class="flex items-center justify-between gap-3 text-[10px]">
+              <span class="font-bold text-[#FF6584]">🔒 Host Only (Private)</span>
+              <span class="text-gray-400">11:40</span>
+            </div>
+            <p class="text-white">Could you boost the bass a little bit?</p>
+            <div class="text-[9px] text-[#00F2FE] text-right font-mono">✓✓ Delivered</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Bar (CHAT-03, CHAT-09) -->
+      <div class="p-2.5 bg-[#141927] border-t border-[#2A334E] flex items-center gap-2">
+        <button onclick="cycleVisibility()" id="visBtn" class="p-2 bg-[#1E2538] hover:bg-[#2A334E] rounded-full text-xs" title="Toggle Channel">
+          🌐
+        </button>
+        <input type="text" id="chatInput" placeholder="Message everyone..." class="flex-1 bg-[#1E2538] border border-[#2A334E] rounded-full px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#6C5CE7]">
+        <button onclick="sendChatMessage()" class="p-2 bg-[#6C5CE7] hover:bg-[#5b4bc4] rounded-full text-xs font-bold text-white">
+          ➤
+        </button>
+      </div>
+    </div>
+
+    <!-- SCREEN 6: ACTIVITIES & MUSIC (ACT-01, ACT-02, FR-04, FR-10) -->
+    <div id="screen_activities" class="screen hidden flex-1 p-4 overflow-y-auto space-y-4">
+      <!-- Activity Switcher Tabs (ACT-01) -->
+      <div class="flex bg-[#1E2538] p-1 rounded-xl text-xs font-semibold">
+        <button onclick="setActivityTab('music')" id="tabMusic" class="flex-1 py-1.5 rounded-lg bg-[#6C5CE7] text-white">
+          🎵 Music Sync
+        </button>
+        <button onclick="setActivityTab('vote')" id="tabVote" class="flex-1 py-1.5 rounded-lg text-gray-400 hover:text-white">
+          🔥 Vibe Vote
+        </button>
+      </div>
+
+      <!-- TAB 1: MUSIC PLAYER -->
+      <div id="activityMusic" class="space-y-4 text-center">
+        <div class="w-40 h-40 mx-auto rounded-3xl bg-[#1E2538] border-2 border-[#6C5CE7]/60 flex items-center justify-center relative shadow-xl overflow-hidden">
+          <div class="flex items-center gap-1">
+            <div class="wave-bar w-1.5 bg-[#6C5CE7] rounded-full"></div>
+            <div class="wave-bar w-1.5 bg-[#FF6584] rounded-full"></div>
+            <div class="wave-bar w-1.5 bg-[#00F2FE] rounded-full"></div>
+            <div class="wave-bar w-1.5 bg-[#6C5CE7] rounded-full"></div>
+            <div class="wave-bar w-1.5 bg-[#FF6584] rounded-full"></div>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-base font-bold text-white">Neon Resonance</h4>
+          <p class="text-xs text-[#00F2FE]">HyperPulse • Synchronized Playback</p>
+        </div>
+
+        <!-- Seekbar -->
+        <div class="space-y-1">
+          <div class="w-full bg-[#1E2538] h-1.5 rounded-full overflow-hidden">
+            <div class="bg-gradient-to-r from-[#6C5CE7] to-[#00F2FE] h-full w-[45%]"></div>
+          </div>
+          <div class="flex justify-between text-[10px] text-gray-400">
+            <span>01:36</span>
+            <span>03:34</span>
+          </div>
+        </div>
+
+        <!-- Master Playback Controls -->
+        <div class="flex items-center justify-center gap-4">
+          <button class="p-2 text-gray-400 hover:text-white text-lg">⏮</button>
+          <button onclick="toggleMusicPlay()" id="playPauseBtn" class="w-12 h-12 rounded-full bg-[#6C5CE7] text-white text-xl flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition">
+            ⏸
+          </button>
+          <button class="p-2 text-gray-400 hover:text-white text-lg">⏭</button>
+        </div>
+
+        <!-- Floating Reactions (FR-10) -->
+        <div class="pt-2">
+          <div class="text-[10px] text-gray-400 mb-2">Tap to Send Live Room Reaction:</div>
+          <div class="flex justify-center gap-3">
+            <button onclick="popReaction('🔥')" class="w-9 h-9 rounded-full bg-[#1E2538] border border-[#2A334E] text-base hover:scale-110 active:scale-90 transition">🔥</button>
+            <button onclick="popReaction('💃')" class="w-9 h-9 rounded-full bg-[#1E2538] border border-[#2A334E] text-base hover:scale-110 active:scale-90 transition">💃</button>
+            <button onclick="popReaction('🎧')" class="w-9 h-9 rounded-full bg-[#1E2538] border border-[#2A334E] text-base hover:scale-110 active:scale-90 transition">🎧</button>
+            <button onclick="popReaction('🚀')" class="w-9 h-9 rounded-full bg-[#1E2538] border border-[#2A334E] text-base hover:scale-110 active:scale-90 transition">🚀</button>
+            <button onclick="popReaction('❤️')" class="w-9 h-9 rounded-full bg-[#1E2538] border border-[#2A334E] text-base hover:scale-110 active:scale-90 transition">❤️</button>
+          </div>
+          <div id="reactionToast" class="h-6 text-sm mt-1 text-[#00F2FE]"></div>
+        </div>
+      </div>
+
+      <!-- TAB 2: VIBE VOTE (ACT-02) -->
+      <div id="activityVote" class="hidden space-y-3">
+        <div class="bg-[#1E2538] border border-[#FF6584]/40 rounded-2xl p-4 space-y-3">
+          <div class="flex items-center gap-2 text-xs font-bold text-[#FF6584]">
+            <span>🗳️</span>
+            <span>ROOM VIBE POLL</span>
+          </div>
+          <div class="text-sm font-bold text-white">What vibe should we play next?</div>
+
+          <div class="space-y-2 text-xs" id="vibeOptions">
+            <div onclick="voteOption(0)" class="vibe-card p-3 rounded-xl bg-[#141927] border border-[#2A334E] hover:border-[#00F2FE] cursor-pointer space-y-1.5 transition">
+              <div class="flex justify-between font-medium">
+                <span>🔥 Electronic & Cyberpunk</span>
+                <span class="text-[#00F2FE] font-bold" id="vcount0">7 votes</span>
+              </div>
+              <div class="w-full bg-[#1E2538] h-1.5 rounded-full overflow-hidden">
+                <div class="bg-[#00F2FE] h-full" style="width: 58%"></div>
+              </div>
+            </div>
+
+            <div onclick="voteOption(1)" class="vibe-card p-3 rounded-xl bg-[#141927] border border-[#2A334E] hover:border-[#00F2FE] cursor-pointer space-y-1.5 transition">
+              <div class="flex justify-between font-medium">
+                <span>💃 Deep House Grooves</span>
+                <span class="text-[#00F2FE] font-bold" id="vcount1">4 votes</span>
+              </div>
+              <div class="w-full bg-[#1E2538] h-1.5 rounded-full overflow-hidden">
+                <div class="bg-[#6C5CE7] h-full" style="width: 33%"></div>
+              </div>
+            </div>
+
+            <div onclick="voteOption(2)" class="vibe-card p-3 rounded-xl bg-[#141927] border border-[#2A334E] hover:border-[#00F2FE] cursor-pointer space-y-1.5 transition">
+              <div class="flex justify-between font-medium">
+                <span>🎧 Chill Lo-Fi Lounge</span>
+                <span class="text-[#00F2FE] font-bold" id="vcount2">1 vote</span>
+              </div>
+              <div class="w-full bg-[#1E2538] h-1.5 rounded-full overflow-hidden">
+                <div class="bg-[#FF6584] h-full" style="width: 9%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 7: BOOM GUARDIAN SECURITY CENTRE (SEC-01 to SEC-04) -->
+    <div id="screen_guardian" class="screen hidden flex-1 p-5 overflow-y-auto space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-extrabold text-white">BOOM Guardian</h3>
+        <span class="text-xs text-[#00F2FE] font-mono">SEC-01 READY</span>
+      </div>
+
+      <!-- Security Score Gauge -->
+      <div class="bg-[#1E2538] border-2 border-[#00F2FE]/40 rounded-2xl p-4 flex items-center gap-4 shadow-lg">
+        <div class="w-16 h-16 rounded-full bg-[#00F2FE]/10 border-2 border-[#00F2FE] flex items-center justify-center font-extrabold text-xl text-[#00F2FE]">
+          100%
+        </div>
+        <div>
+          <div class="text-[10px] font-bold text-[#00F2FE] uppercase tracking-wider">ALL DEFENSES ACTIVE</div>
+          <div class="text-sm font-bold text-white">System Integrity Protected</div>
+          <div class="text-[10px] text-gray-400">Hardware Keystore • TLS 1.3 • Chat Isolation</div>
+        </div>
+      </div>
+
+      <!-- Active Defenses Checklist (SEC-03) -->
+      <div class="space-y-2 text-xs">
+        <div class="font-bold text-white text-xs">Active Defense Layers</div>
+
+        <div class="p-2.5 bg-[#1E2538] border border-[#2A334E] rounded-xl flex items-start gap-2">
+          <span class="text-[#00F2FE]">✓</span>
+          <div>
+            <div class="font-bold text-white">Hardware Keystore Encryption</div>
+            <div class="text-[10px] text-gray-400">AES-GCM-256 encrypted session tokens</div>
+          </div>
+        </div>
+
+        <div class="p-2.5 bg-[#1E2538] border border-[#2A334E] rounded-xl flex items-start gap-2">
+          <span class="text-[#00F2FE]">✓</span>
+          <div>
+            <div class="font-bold text-white">Transport Security & Mesh Auth</div>
+            <div class="text-[10px] text-gray-400">TLS 1.3 cloud / Ephemeral SAS pairing</div>
+          </div>
+        </div>
+
+        <div class="p-2.5 bg-[#1E2538] border border-[#2A334E] rounded-xl flex items-start gap-2">
+          <span class="text-[#00F2FE]">✓</span>
+          <div>
+            <div class="font-bold text-white">Object-Level Chat Privacy</div>
+            <div class="text-[10px] text-gray-400">Strict host-only isolation; zero P2P snooping</div>
+          </div>
+        </div>
+
+        <div class="p-2.5 bg-[#1E2538] border border-[#2A334E] rounded-xl flex items-start gap-2">
+          <span class="text-[#00F2FE]">✓</span>
+          <div>
+            <div class="font-bold text-white">Abuse Throttling & Replay Guard</div>
+            <div class="text-[10px] text-gray-400">5-attempt OTP limits and timestamp validation</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Non-Intrusive Privacy Manifesto (SEC-04) -->
+      <div class="bg-[#6C5CE7]/15 border border-[#6C5CE7]/50 rounded-2xl p-3.5 space-y-1.5 text-xs">
+        <div class="font-bold text-[#00F2FE] flex items-center gap-1.5">
+          <span>🛡️</span>
+          <span>Non-Intrusive Privacy Architecture</span>
+        </div>
+        <p class="text-[11px] text-gray-300">• Zero device file scanning outside application sandbox.</p>
+        <p class="text-[11px] text-gray-300">• Zero voice calling, eavesdropping, or audio recording.</p>
+        <p class="text-[11px] text-gray-300">• Strict regex redaction of passwords and OTPs in logs.</p>
+      </div>
+    </div>
+
+    <!-- Phone Bottom Navigation Bar -->
+    <div class="h-12 bg-[#0B0E17] border-t border-[#2A334E] px-4 flex items-center justify-around text-xs text-gray-400">
+      <button onclick="setScreen('dashboard')" class="hover:text-white flex flex-col items-center">
+        <span>🏠</span>
+        <span class="text-[9px]">Home</span>
+      </button>
+      <button onclick="setScreen('activities')" class="hover:text-white flex flex-col items-center">
+        <span>🎵</span>
+        <span class="text-[9px]">Activities</span>
+      </button>
+      <button onclick="setScreen('chat')" class="hover:text-white flex flex-col items-center">
+        <span>💬</span>
+        <span class="text-[9px]">Chat</span>
+      </button>
+      <button onclick="setScreen('guardian')" class="hover:text-white flex flex-col items-center">
+        <span>🛡️</span>
+        <span class="text-[9px]">Security</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Screen navigation
+    function setScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+      const active = document.getElementById('screen_' + screenId);
+      if (active) active.classList.remove('hidden');
+
+      // Update pill states
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        if (btn.getAttribute('data-screen') === screenId) {
+          btn.className = 'nav-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-[#6C5CE7] text-white transition-all shadow';
+        } else {
+          btn.className = 'nav-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-[#1E2538] text-gray-300 hover:text-white transition-all';
+        }
+      });
+    }
+
+    // Reduced motion toggle (UI-02)
+    function toggleMotion() {
+      const isChecked = document.getElementById('motionToggle').checked;
+      if (isChecked) {
+        document.body.classList.add('reduced-motion');
+      } else {
+        document.body.classList.remove('reduced-motion');
+      }
+    }
+
+    // Host Approval simulation
+    function approveGuest() {
+      document.getElementById('pendingBox').innerHTML = `
+        <div class="p-2.5 bg-[#00F2FE]/15 border border-[#00F2FE] rounded-xl text-xs text-[#00F2FE] font-bold">
+          ✓ Charlie Davis Approved & Connected!
+        </div>
+      `;
+      document.getElementById('connectedCount').innerText = '3';
+      const roster = document.getElementById('rosterList');
+      const charlieCard = document.createElement('div');
+      charlieCard.className = 'bg-[#1E2538] border border-[#2A334E] p-3 rounded-xl flex items-center justify-between text-xs';
+      charlieCard.innerHTML = `
+        <div class="flex items-center gap-2.5">
+          <div class="w-7 h-7 rounded-full bg-[#00F2FE]/20 text-[#00F2FE] flex items-center justify-center font-bold text-[10px]">C</div>
+          <div>
+            <div class="font-bold text-white">Charlie Davis</div>
+            <div class="text-[10px] text-gray-400">Drift: +2ms • Sync: EXCELLENT</div>
+          </div>
+        </div>
+        <button onclick="this.parentElement.remove(); document.getElementById('connectedCount').innerText='2';" class="px-2 py-1 bg-[#FF6584]/20 hover:bg-[#FF6584] hover:text-white text-[#FF6584] rounded text-[10px] font-semibold transition">Kick</button>
+      `;
+      roster.appendChild(charlieCard);
+    }
+
+    function denyGuest() {
+      document.getElementById('pendingBox').innerHTML = `
+        <div class="p-2.5 bg-gray-800 border border-gray-700 rounded-xl text-xs text-gray-400">
+          Request Denied.
+        </div>
+      `;
+    }
+
+    function kickBob() {
+      const bob = document.getElementById('memberBob');
+      if (bob) bob.remove();
+      document.getElementById('connectedCount').innerText = '1';
+    }
+
+    // Volume Slider (FR-06)
+    function updateVolume(val) {
+      document.getElementById('volumePercent').innerText = val + '%';
+    }
+
+    function leaveParty() {
+      alert("Left party session immediately (JOIN-04). Returning to Dashboard.");
+      setScreen('dashboard');
+    }
+
+    // Chat Channel Visibility
+    let currentVis = 'EVERYONE';
+    function cycleVisibility() {
+      const btn = document.getElementById('visBtn');
+      const input = document.getElementById('chatInput');
+      const banner = document.getElementById('chatPrivacyBanner');
+      const label = document.getElementById('chatChannelLabel');
+
+      if (currentVis === 'EVERYONE') {
+        currentVis = 'HOST_ONLY';
+        btn.innerText = '🔒';
+        input.placeholder = 'Private message to Host...';
+        banner.classList.remove('hidden');
+        label.innerText = 'Host-Only Channel (Private)';
+      } else if (currentVis === 'HOST_ONLY') {
+        currentVis = 'ANNOUNCEMENT';
+        btn.innerText = '📢';
+        input.placeholder = 'Broadcast announcement...';
+        banner.classList.add('hidden');
+        label.innerText = 'Announcement Channel (Broadcast)';
+      } else {
+        currentVis = 'EVERYONE';
+        btn.innerText = '🌐';
+        input.placeholder = 'Message everyone...';
+        banner.classList.add('hidden');
+        label.innerText = 'Public Channel (Visible to Everyone)';
+      }
+    }
+
+    function setChatFilter(filter) {
+      document.querySelectorAll('.chat-tab').forEach(t => {
+        t.className = 'chat-tab px-2 py-0.5 rounded text-[10px] bg-[#1E2538] text-gray-300';
+      });
+      event.target.className = 'chat-tab px-2 py-0.5 rounded text-[10px] bg-[#6C5CE7] text-white';
+
+      const msgs = document.querySelectorAll('.chat-msg');
+      if (filter === 'all') {
+        msgs.forEach(m => m.style.display = 'flex');
+      } else if (filter === 'host_only') {
+        msgs.forEach(m => m.style.display = m.classList.contains('host_only') ? 'flex' : 'none');
+      } else if (filter === 'announcements') {
+        msgs.forEach(m => m.style.display = 'none');
+      }
+    }
+
+    function sendChatMessage() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const timeline = document.getElementById('chatTimeline');
+      const msgDiv = document.createElement('div');
+      const isPriv = currentVis === 'HOST_ONLY';
+      const isAnnounce = currentVis === 'ANNOUNCEMENT';
+
+      msgDiv.className = isAnnounce
+        ? 'p-2.5 rounded-xl bg-[#6C5CE7]/20 border border-[#00F2FE] space-y-1'
+        : `chat-msg ${isPriv ? 'host_only' : 'public'} flex flex-col items-end self-end max-w-[85%] ml-auto`;
+
+      msgDiv.innerHTML = isAnnounce ? `
+        <div class="flex justify-between items-center text-[10px]">
+          <span class="font-bold text-[#00F2FE]">📢 ANNOUNCEMENT • Alex</span>
+          <span class="text-gray-400">Just now</span>
+        </div>
+        <p class="text-white">${text}</p>
+      ` : `
+        <div class="${isPriv ? 'bg-[#FF6584]/20 border border-[#FF6584]/60' : 'bg-[#6C5CE7]/80'} p-2.5 rounded-2xl rounded-br-sm space-y-0.5">
+          <div class="flex items-center justify-between gap-3 text-[10px]">
+            <span class="font-bold ${isPriv ? 'text-[#FF6584]' : 'text-[#00F2FE]'}">${isPriv ? '🔒 Host Only' : 'Alex (You)'}</span>
+            <span class="text-gray-300">Just now</span>
+          </div>
+          <p class="text-white">${text}</p>
+          <div class="text-[9px] text-[#00F2FE] text-right font-mono">✓✓ Delivered</div>
+        </div>
+      `;
+
+      timeline.appendChild(msgDiv);
+      timeline.scrollTop = timeline.scrollHeight;
+      input.value = '';
+    }
+
+    // Activities Tab Switching
+    function setActivityTab(tab) {
+      if (tab === 'music') {
+        document.getElementById('activityMusic').classList.remove('hidden');
+        document.getElementById('activityVote').classList.add('hidden');
+        document.getElementById('tabMusic').className = 'flex-1 py-1.5 rounded-lg bg-[#6C5CE7] text-white';
+        document.getElementById('tabVote').className = 'flex-1 py-1.5 rounded-lg text-gray-400 hover:text-white';
+      } else {
+        document.getElementById('activityMusic').classList.add('hidden');
+        document.getElementById('activityVote').classList.remove('hidden');
+        document.getElementById('tabVote').className = 'flex-1 py-1.5 rounded-lg bg-[#6C5CE7] text-white';
+        document.getElementById('tabMusic').className = 'flex-1 py-1.5 rounded-lg text-gray-400 hover:text-white';
+      }
+    }
+
+    let isPlaying = true;
+    function toggleMusicPlay() {
+      isPlaying = !isPlaying;
+      document.getElementById('playPauseBtn').innerText = isPlaying ? '⏸' : '▶';
+    }
+
+    function popReaction(emoji) {
+      const toast = document.getElementById('reactionToast');
+      toast.innerText = 'Sent reaction ' + emoji + ' to the room!';
+      setTimeout(() => toast.innerText = '', 2000);
+    }
+
+    let voteCounts = [7, 4, 1];
+    function voteOption(idx) {
+      voteCounts[idx]++;
+      document.getElementById('vcount' + idx).innerText = voteCounts[idx] + ' votes';
+      alert("Vote recorded! Live tallies synchronized with master session.");
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">BOOM</string>
+    <string name="tagline">Your friends. Your music. Your BOOM.</string>
+
+    <!-- Permission explanations -->
+    <string name="perm_nearby_title">Nearby Devices Access Required</string>
+    <string name="perm_nearby_desc">BOOM requires Bluetooth and local network permissions to discover friends phones and synchronize music playback with sub-millisecond precision.</string>
+</resources>
